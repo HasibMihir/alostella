@@ -1,0 +1,126 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useRef, useState } from "react";
+import { Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { EnquiryCTA } from "@/components/editorial";
+import { films, pageHead } from "@/lib/portfolio";
+export const Route = createFileRoute("/films")({
+  head: () =>
+    pageHead(
+      "Films",
+      "Moving images for people, places and brands. Discover the ALOSTELLA film portfolio.",
+      "/films",
+    ),
+  component: Films,
+});
+function Films() {
+  const [active, setActive] = useState<number | null>(null);
+  const trigger = useRef<HTMLButtonElement | null>(null);
+  const film = active === null ? undefined : films[active];
+  const featured = films[0];
+  if (!featured) return null;
+  return (
+    <>
+      <div className="inner-page">
+        <div className="page-intro">
+          <span className="eyebrow">The film collection</span>
+          <h1>
+            Stories, <em>in motion.</em>
+          </h1>
+          <p>
+            Moving images that bring people, places and stories to life. From live events to brand
+            content and video production.
+          </p>
+        </div>
+        <div className="film-feature">
+          <img src={featured.image} alt={featured.alt} />
+          <Button
+            variant="ghost"
+            className="play-control"
+            aria-label="Open showreel"
+            onClick={(e) => {
+              trigger.current = e.currentTarget;
+              setActive(0);
+            }}
+          >
+            <Play />
+          </Button>
+          <span className="film-badge small-label">Showreel · Placeholder media</span>
+        </div>
+        <div className="image-caption">
+          <h2 className="text-4xl">ALOSTELLA — Showreel</h2>
+          <span className="small-label">Coming soon</span>
+        </div>
+        <div className="film-grid">
+          {films.slice(1).map((f, i) => (
+            <article key={f.title}>
+              <div className="film-feature">
+                <img src={f.image} alt={f.alt} loading="lazy" />
+                <Button
+                  variant="ghost"
+                  className="play-control"
+                  aria-label={`Open film: ${f.title}`}
+                  onClick={(e) => {
+                    trigger.current = e.currentTarget;
+                    setActive(i + 1);
+                  }}
+                >
+                  <Play />
+                </Button>
+                <span className="film-badge small-label">Placeholder film</span>
+              </div>
+              <h2>{f.title}</h2>
+              <span className="small-label">{f.category}</span>
+              <p>{f.description}</p>
+            </article>
+          ))}
+        </div>
+        <p className="placeholder-note mt-10">
+          Sample film entries with supplied photograph posters. Genuine films and the showreel have
+          not yet been added.
+        </p>
+      </div>
+      <Dialog
+        open={active !== null}
+        onOpenChange={(v) => {
+          if (!v) setActive(null);
+        }}
+      >
+        <DialogContent
+          onCloseAutoFocus={(e) => {
+            e.preventDefault();
+            trigger.current?.focus();
+          }}
+          className="film-modal"
+        >
+          <DialogTitle>{film?.title}</DialogTitle>
+          <DialogDescription>{film?.description}</DialogDescription>
+          {film?.videoUrl ? (
+            <video
+              controls
+              autoPlay
+              playsInline
+              preload="none"
+              poster={film.image}
+              className="w-full"
+              src={film.videoUrl}
+            >
+              Your browser does not support video playback.
+            </video>
+          ) : (
+            <>
+              <img src={film?.image} alt={film?.alt ?? "Film poster"} />
+              <p className="placeholder-note">
+                Placeholder film — no video is connected yet.
+                <br />
+                The genuine ALOSTELLA film will be available here once added.
+              </p>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+      <EnquiryCTA />
+    </>
+  );
+}

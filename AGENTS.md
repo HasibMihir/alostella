@@ -8,3 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep editable portfolio entries and media references in a shared data module so every page presents the same curated content.
+- Use shared editorial layout components around file-based page routes for consistent navigation and enquiry access.
+- Keep the enquiry form frontend-only until a submission destination is explicitly configured; never simulate successful delivery.

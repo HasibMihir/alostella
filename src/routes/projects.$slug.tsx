@@ -1,0 +1,57 @@
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { EnquiryCTA } from "@/components/editorial";
+import { PhotoGallery } from "@/components/photo-gallery";
+import { projects, pageHead } from "@/lib/portfolio";
+export const Route = createFileRoute("/projects/$slug")({
+  loader: ({ params }) => {
+    const project = projects.find((p) => p.slug === params.slug);
+    if (!project) throw notFound();
+    return project;
+  },
+  head: ({ loaderData, params }) =>
+    loaderData
+      ? pageHead(loaderData.title, loaderData.description, `/projects/${params.slug}`)
+      : {
+          meta: [
+            { title: "Story not found — ALOSTELLA" },
+            { name: "description", content: "This ALOSTELLA story is unavailable." },
+            { property: "og:title", content: "Story not found — ALOSTELLA" },
+            { property: "og:description", content: "This ALOSTELLA story is unavailable." },
+            { property: "og:type", content: "website" },
+            { name: "twitter:card", content: "summary_large_image" },
+            { name: "robots", content: "noindex" },
+          ],
+        },
+  component: Project,
+});
+function Project() {
+  const project = Route.useLoaderData();
+  return (
+    <>
+      <div className="inner-page">
+        <div className="page-intro">
+          <Link
+            to="/photography"
+            search={{ category: "All" }}
+            className="small-label inline-flex items-center gap-2 mb-9"
+          >
+            <ArrowLeft size={12} />
+            Back to the collection
+          </Link>
+          <span className="eyebrow">{project.category}</span>
+          <h1>{project.title}</h1>
+          <p>{project.description}</p>
+          <span className="placeholder-note block mt-4">
+            Sample project title and description · Supplied photographs
+          </span>
+        </div>
+        <img className="project-hero" src={project.cover} alt={project.alt} fetchPriority="high" />
+        <div className="mt-14">
+          <PhotoGallery images={project.images} />
+        </div>
+      </div>
+      <EnquiryCTA />
+    </>
+  );
+}

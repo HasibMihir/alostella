@@ -1,24 +1,216 @@
-import { createFileRoute } from "@tanstack/react-router";
-
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowUpRight, ArrowDown, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { EnquiryCTA, Process, AboutBlock } from "@/components/editorial";
+import { media, projects, pageHead } from "@/lib/portfolio";
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () =>
+    pageHead(
+      "Photography & Film",
+      "ALOSTELLA captures meaningful moments, people, places and brands through considered photography and film in the UK.",
+      "/",
+    ),
+  component: Home,
 });
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <>
+      <div className="page-shell">
+        <section className="hero">
+          <img
+            className="hero-photo"
+            src={media.city.url}
+            alt="An expansive view across Brighton, its streets and the distant sea"
+            fetchPriority="high"
+          />
+          <div className="hero-content">
+            <div className="hero-brand">ALOSTELLA</div>
+            <span className="hero-label">Photography &nbsp; — &nbsp; Film</span>
+            <h1>
+              Moments, <em>Made Eternal.</em>
+            </h1>
+            <p className="hero-copy">
+              Photography and films for people, places and brands with a story to tell.
+            </p>
+            <div className="hero-actions">
+              <Button asChild variant="editorialLight">
+                <Link to="/photography">
+                  Explore the Work <ArrowUpRight />
+                </Link>
+              </Button>
+              <Button asChild variant="editorialText">
+                <Link to="/contact">
+                  Start an Enquiry <ArrowUpRight />
+                </Link>
+              </Button>
+            </div>
+          </div>
+          <div className="hero-bottom">
+            <span>Based in the UK · Available for your story</span>
+            <span>
+              Still & moving stories <ArrowDown size={12} />
+            </span>
+          </div>
+        </section>
+        <section className="section">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">01 / The portfolio</span>
+              <h2>
+                Stories, <em>beautifully told.</em>
+              </h2>
+            </div>
+            <p>
+              A considered collection of people, places
+              <br />
+              and moments. Each with a story of its own.
+            </p>
+          </div>
+          <div className="work-grid">
+            {[
+              {
+                title: "Weddings & People",
+                label: "Connection, in every frame",
+                image: media.details.url,
+                alt: "Thoughtfully styled details at a celebration",
+                to: "/photography" as const,
+                category: "Weddings",
+              },
+              {
+                title: "Events",
+                label: "The feeling of being there",
+                image: media.night.url,
+                alt: "The energy of a cultural night",
+                to: "/photography" as const,
+                category: "Events",
+              },
+              {
+                title: "Brands & Campaigns",
+                label: "A different perspective",
+                image: media.city.url,
+                alt: "Brighton architecture and streets from above",
+                to: "/photography" as const,
+                category: "Commercial & Brand",
+              },
+              {
+                title: "Films",
+                label: "Stories in motion",
+                image: media.tower.url,
+                alt: "Aerial view of Brighton observation tower",
+                to: "/films" as const,
+                category: undefined,
+              },
+            ].map((w) => (
+              <Link
+                key={w.title}
+                to={w.to}
+                search={w.to === "/photography" ? { category: w.category ?? "All" } : {}}
+                className="work-item zoom"
+              >
+                <div className="work-image">
+                  <img src={w.image} alt={w.alt} loading="lazy" />
+                </div>
+                <div className="image-caption">
+                  <h3>{w.title}</h3>
+                  <ArrowUpRight size={19} />
+                </div>
+                <span className="small-label">{w.label}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+        <section className="section divider">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">02 / A closer look</span>
+              <h2>
+                Selected <em>stories.</em>
+              </h2>
+            </div>
+            <span className="placeholder-note">
+              Curated from supplied photographs.
+              <br />
+              Project titles & descriptions are sample entries.
+            </span>
+          </div>
+          <div className="featured-grid">
+            {projects.map((p) => (
+              <article key={p.slug} className="project-item">
+                <Link to="/projects/$slug" params={{ slug: p.slug }} className="zoom block">
+                  <div className="project-cover">
+                    <img src={p.cover} alt={p.alt} loading="lazy" />
+                  </div>
+                  <h3>{p.title}</h3>
+                </Link>
+                <span className="small-label">{p.category}</span>
+                <p>{p.description}</p>
+                <Button asChild variant="editorialText">
+                  <Link to="/projects/$slug" params={{ slug: p.slug }}>
+                    View story <ArrowUpRight />
+                  </Link>
+                </Button>
+              </article>
+            ))}
+          </div>
+        </section>
+        <section className="section divider">
+          <div className="service-row">
+            <img
+              className="service-photo"
+              src={media.conversation.url}
+              alt="Meaningful connections at a live event"
+              loading="lazy"
+            />
+            <div className="service-copy">
+              <span className="eyebrow">03 / Still & moving</span>
+              <h2>Photography.</h2>
+              <p>Still images that preserve the atmosphere, detail and emotion of a moment.</p>
+              <span className="small-label">Weddings · Live events · Portraits · Commercial</span>
+              <div className="mt-7">
+                <Button asChild variant="editorialText">
+                  <Link to="/photography">
+                    Explore photography <ArrowRight />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="service-row reverse">
+            <img
+              className="service-photo"
+              src={media.aerial.url}
+              alt="A film perspective over Brighton and its railway"
+              loading="lazy"
+            />
+            <div className="service-copy">
+              <span className="eyebrow">A story beyond the frame</span>
+              <h2>Film.</h2>
+              <p>Moving images that bring people, places and stories to life.</p>
+              <span className="small-label">
+                Corporate events · Brand content · Video production
+              </span>
+              <div className="mt-7">
+                <Button asChild variant="editorialText">
+                  <Link to="/films">
+                    Explore films <ArrowRight />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="section divider">
+          <AboutBlock />
+        </section>
+        <section className="section divider">
+          <span className="eyebrow">04 / The approach</span>
+          <h2>
+            From an idea <em>to a lasting story.</em>
+          </h2>
+          <Process />
+        </section>
+      </div>
+      <EnquiryCTA />
+    </>
   );
 }

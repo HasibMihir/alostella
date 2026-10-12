@@ -1,0 +1,145 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { ArrowUpRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { prepareEnquiry } from "@/lib/enquiry";
+import { pageHead } from "@/lib/portfolio";
+export const Route = createFileRoute("/contact")({
+  head: () =>
+    pageHead(
+      "Enquire",
+      "Tell ALOSTELLA about your wedding, event, photography or film project in the UK.",
+      "/contact",
+    ),
+  component: Contact,
+});
+function Contact() {
+  const [errors, setErrors] = useState<Record<string, string[] | undefined>>({});
+  const [checked, setChecked] = useState(false);
+  function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const result = prepareEnquiry(Object.fromEntries(new FormData(e.currentTarget)));
+    setChecked(false);
+    if (!result.valid) {
+      setErrors(result.errors);
+      return;
+    }
+    setErrors({});
+    setChecked(true);
+  }
+  function field(name: string, label: string, type = "text", required = false, maxLength = 200) {
+    return (
+      <div className="form-field">
+        <label htmlFor={name}>
+          {label}
+          {required ? " *" : ""}
+        </label>
+        <input
+          id={name}
+          name={name}
+          type={type}
+          required={required}
+          maxLength={maxLength}
+          autoComplete={name === "name" ? "name" : name === "email" ? "email" : undefined}
+          aria-invalid={!!errors[name]}
+          aria-describedby={errors[name] ? `${name}-error` : undefined}
+        />
+        {errors[name] && (
+          <span id={`${name}-error`} className="form-error">
+            {errors[name]?.[0]}
+          </span>
+        )}
+      </div>
+    );
+  }
+  return (
+    <div className="inner-page">
+      <div className="page-intro">
+        <span className="eyebrow">Every story starts with a conversation</span>
+        <h1>
+          Tell us what
+          <br />
+          <em>you're planning.</em>
+        </h1>
+        <p>
+          Have an event, project or idea in mind? Share a few details below. We'd love to hear the
+          story.
+        </p>
+      </div>
+      <div className="contact-layout">
+        <form className="contact-form" noValidate onSubmit={submit}>
+          {field("name", "Full name", "text", true, 100)}
+          {field("email", "Email address", "email", true, 255)}
+          <div className="form-field">
+            <label htmlFor="service">Service required</label>
+            <select id="service" name="service">
+              {["Photography", "Videography", "Both", "Other"].map((s) => (
+                <option key={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-field">
+            <label htmlFor="projectType">Project type</label>
+            <select id="projectType" name="projectType">
+              {["Wedding", "Event", "Commercial", "Brand Content", "Portrait", "Other"].map((s) => (
+                <option key={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+          {field("date", "Event or project date", "date")}
+          {field("location", "Location")}
+          {field("budget", "Estimated budget", "text", false, 100)}
+          <div className="form-field full-width">
+            <label htmlFor="details">Project details *</label>
+            <textarea
+              id="details"
+              name="details"
+              required
+              maxLength={5000}
+              placeholder="A little about your project, the atmosphere and what you have in mind…"
+              aria-invalid={!!errors["details"]}
+              aria-describedby={errors["details"] ? "details-error" : undefined}
+            />
+            {errors["details"] && (
+              <span id="details-error" className="form-error">
+                {errors["details"][0]}
+              </span>
+            )}
+          </div>
+          <div className="full-width setup-message" role="status">
+            {checked
+              ? "Your details are ready, but your enquiry has not been sent. A submission destination must be connected before this form can deliver enquiries."
+              : "Enquiry delivery is not configured yet. This form can check your details, but cannot send enquiries until a destination is connected."}
+          </div>
+          <div className="full-width">
+            <Button type="submit" variant="editorial">
+              Send Enquiry <ArrowUpRight />
+            </Button>
+          </div>
+        </form>
+        <aside className="contact-aside">
+          <span className="eyebrow">A direct connection</span>
+          <h2>
+            Let's make
+            <br />
+            <em>something meaningful.</em>
+          </h2>
+          <p>Photography and film for weddings, events, people and brands across the UK.</p>
+          <a href="mailto:hello@example.com" className="text-button inline-flex">
+            hello@example.com <ArrowUpRight size={14} className="ml-3" />
+          </a>
+          <p className="placeholder-note">Email placeholder — replace before launch.</p>
+          <a
+            href="https://www.instagram.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-button inline-flex"
+          >
+            Instagram <ArrowUpRight size={14} className="ml-3" />
+          </a>
+          <p className="placeholder-note">Instagram profile placeholder.</p>
+        </aside>
+      </div>
+    </div>
+  );
+}
